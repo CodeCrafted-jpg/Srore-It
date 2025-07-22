@@ -85,9 +85,9 @@ const MobileNavBar = ({ avatar, fullName, email, ownerId, accountId }: Props) =>
             </ul>
 
           </nav>
-          <div className='py-8'>
-            <FileUpload ownerId={ownerId} accountId={accountId} className={''}/>
-            <Button type='submit' className='sign-out-button py-4'>
+          <div className="flex flex-col justify-between gap-5 pb-5">
+            <FileUpload ownerId={ownerId} accountId={accountId} className={""}/>
+            <Button type='submit' className="mobile-sign-out-button">
               <Image
                 src={"/assets/icons/logout.svg"}
                 alt='logo'

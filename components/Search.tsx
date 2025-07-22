@@ -3,13 +3,14 @@
 import React, { useEffect, useState } from 'react'
 import { Input } from './ui/input'
 import Image from 'next/image'
-import { useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { getFiles } from '@/action/file.action'
 import { Models } from 'node-appwrite'
 import Thumbnail from './Thumbnail'
 import FormattedDateTIme from './FormattedDateTIme'
 import { useRouter } from 'next/navigation'
 import { Button } from './ui/button'
+import { useDebounce } from 'use-debounce';
 
 
 const Search = () => {
@@ -19,10 +20,18 @@ const Search = () => {
   const [result, setresult] = useState<Models.Document[]>([])
   const [open, setopen] = useState(false)
   const router=useRouter()
+  const path=usePathname()
+  const[debouncedInput]=useDebounce(input,500)
 
 useEffect(() => {
   const featchFiles=async()=>{
-    const files=await getFiles({searchText:input})
+   if(debouncedInput.length===0){
+    setresult([])
+    setopen(false)
+    return router.push(path.replace(searchParams.toString(),""))
+   }
+
+    const files=await getFiles({searchText:debouncedInput,types:[]})
     setresult(files.documents)
     setopen(true)
   }
@@ -30,7 +39,7 @@ useEffect(() => {
 
  featchFiles()
   }
-, [input])
+, [debouncedInput])
 
 
 
@@ -51,8 +60,9 @@ useEffect(() => {
 
 
     const CloseModel=()=>{
+      setinput("")
      setopen(false)
-     setinput("")
+     
      setresult([])
     }
   
@@ -72,12 +82,12 @@ useEffect(() => {
       placeholder='Search for files..'
       onChange={(e)=>setinput(e.target.value)}
       />
-      <Button
+      {/* <Button
       className='bg-white text-red hover:bg-brand-100'
      onClick={()=>CloseModel()}
       >
       x
-      </Button>
+      </Button> */}
       {open &&(
         <ul className='search-result'>
           {result.length>0 ? (

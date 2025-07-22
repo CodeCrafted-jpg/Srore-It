@@ -1,6 +1,6 @@
 "use server"
 
-import { createAdminClient } from "@/appwrite"
+import { createAdminClient, createSessionClient } from "@/appwrite"
 
 import {InputFile} from 'node-appwrite/file'
 import { appwriteConfig } from "@/appwrite/config"
@@ -177,4 +177,54 @@ try {
 } catch (error) {
   HandleError(error,"Failed to rename file")
 }
+}
+
+
+
+export async function getTotalSpaceUsed() {
+  try {
+    const { databases } = await createSessionClient();
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("User is not authenticated.");
+
+    const files = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.fileCollection,
+      [Query.equal("owner", [currentUser.$id])],
+    );
+
+    const totalSpace = {
+      image: { size: 0, latestDate: "" },
+      document: { size: 0, latestDate: "" },
+      video: { size: 0, latestDate: "" },
+      audio: { size: 0, latestDate: "" },
+      other: { size: 0, latestDate: "" },
+      used: 0,
+      all: 2 * 1024 * 1024 * 1024, // 2GB
+    };
+
+    files.documents.forEach((file) => {
+      const rawType = file.type as FileType;
+      const fileType: FileType = ["image", "document", "video", "audio", "other"].includes(rawType)
+        ? rawType
+        : "other";
+
+      const size = file.size || 0;
+      const updatedAt = file.$updatedAt || "";
+
+      totalSpace[fileType].size += size;
+      totalSpace.used += size;
+
+      if (
+        !totalSpace[fileType].latestDate ||
+        new Date(updatedAt) > new Date(totalSpace[fileType].latestDate)
+      ) {
+        totalSpace[fileType].latestDate = updatedAt;
+      }
+    });
+
+    return parseStringify(totalSpace);
+  } catch (error) {
+    HandleError(error, "Error calculating total space used:");
+  }
 }
