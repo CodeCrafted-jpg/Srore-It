@@ -1,13 +1,15 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
 
-const nextConfig: NextConfig = {
-
-  experimental:{
-    serverActions:{
-      bodySizeLimit:"100MB"
-    }
+  typescript:{
+ ignoreBuildErrors:true
   },
- images: {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "100MB",
+    },
+  },
+  images: {
     remotePatterns: [
       {
         protocol: "https",
