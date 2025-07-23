@@ -52,7 +52,7 @@ export const getFileType = (fileName: string) => {
 
   if (documentExtensions.includes(extension))
     return { type: 'document', extension };
-  if (imageExtensions.includes(extension)) return { type: 'images', extension }; // <-- fix here
+  if (imageExtensions.includes(extension)) return { type: 'images', extension }; 
   if (videoExtensions.includes(extension)) return { type: 'video', extension };
   if (audioExtensions.includes(extension)) return { type: 'audio', extension };
 
@@ -179,8 +179,8 @@ export const getUsageSummary = (totalSpace: any) => {
     },
     {
       title: 'Images',
-      size: totalSpace.image.size,
-      latestDate: totalSpace.image.latestDate,
+      size:totalSpace.other.size,
+      latestDate: totalSpace.other.latestDate,
       icon: '/assets/icons/file-image-light.svg',
       url: '/images',
     },
@@ -196,8 +196,8 @@ export const getUsageSummary = (totalSpace: any) => {
     },
     {
       title: 'Others',
-      size: totalSpace.other.size,
-      latestDate: totalSpace.other.latestDate,
+      size: totalSpace.image.size,
+      latestDate: totalSpace.image.latestDate,
       icon: '/assets/icons/file-other-light.svg',
       url: '/others',
     },
